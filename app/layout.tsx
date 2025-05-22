@@ -5,6 +5,7 @@ import "./globals.css"
 import { ThemeProvider } from "./components/theme-provider"
 import Navbar from "./components/navbar"
 import CartProvider from "./components/cart-provider"
+import { Toaster } from "@/components/ui/sonner"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -36,6 +37,7 @@ export default function RootLayout({
             </div>
           </CartProvider>
         </ThemeProvider>
+        <Toaster />
       </body>
     </html>
   )
