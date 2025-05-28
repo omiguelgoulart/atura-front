@@ -7,6 +7,8 @@ import { useCart } from "./cart-provider"
 import { SearchBar } from "../components/search-bar"
 import { ProdutoItf } from "../utils/types/ProdutoItf"
 import { useEffect, useState } from "react";
+import LoginButton from "./LoginButton"; 
+
 
 export default function Navbar() {
   const { cart } = useCart()
@@ -48,6 +50,7 @@ export default function Navbar() {
           <Button variant="outline" size="icon" asChild>
             <Link href="/carrinho" className="relative">
               <ShoppingCart className="h-5 w-5" />
+             
               {totalItems > 0 && (
                 <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
                   {totalItems}
@@ -56,6 +59,7 @@ export default function Navbar() {
               <span className="sr-only">Carrinho</span>
             </Link>
           </Button>
+         <LoginButton />
         </div>
         
       </div>
