@@ -47,7 +47,7 @@ export default function Sidebar({
     fetchProdutos()
   }, [])
 
-  // Extrai marcas únicas por ID
+  
   const marcasUnicas = Array.from(
     new Map(produtos.map((p) => [p.marca.id, p.marca])).values()
   )
@@ -58,7 +58,7 @@ export default function Sidebar({
     const params = new URLSearchParams()
 
     if (data.brandIds.length > 0) {
-      // pode adaptar para múltiplas se necessário
+      
       params.set("marca", String(data.brandIds[0]))
     }
     if (data.types.length > 0) {
@@ -70,7 +70,7 @@ export default function Sidebar({
 
   const FiltersContent = () => (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {/* Marcas */}
+     
       <div>
         <h3 className="text-lg font-medium mb-3">Marcas</h3>
         <div className="space-y-2">
@@ -105,7 +105,7 @@ export default function Sidebar({
         </div>
       </div>
 
-      {/* Categorias */}
+     
       <div>
         <h3 className="text-lg font-medium mb-3">Categoria</h3>
         <div className="space-y-2">

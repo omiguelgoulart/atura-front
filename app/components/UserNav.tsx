@@ -12,9 +12,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogIn, LogOut, UserCircle } from "lucide-react"; // Ícones
+import { LogIn, LogOut, UserCircle } from "lucide-react";
 
-// Dados fictícios do usuário - em uma aplicação real, viriam do estado de autenticação
+
 const mockUser = {
   name: "Usuário Atura",
   email: "usuario.atura@exemplo.com",
@@ -24,7 +24,7 @@ const mockUser = {
 
 interface UserNavProps {
   isLoggedIn: boolean;
-  onLogout: () => void; // Função para simular o logout
+  onLogout: () => void; 
 }
 
 export function UserNav({ isLoggedIn, onLogout }: UserNavProps) {

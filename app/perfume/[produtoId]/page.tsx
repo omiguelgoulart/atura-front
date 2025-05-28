@@ -36,12 +36,12 @@ export default function ProdutoPage() {
           </div>
         </div>
 
-        {/* DETALHES */}
+        
         <div className="flex flex-col gap-4">
           <h1 className="text-3xl font-bold">{produto?.nome}</h1>
 
           <div className="flex items-center gap-1">
-            {Array(Math.floor(4.5)) // Exemplo fixo
+            {Array(Math.floor(4.5)) 
               .fill(0)
               .map((_, i) => (
                 <Star key={i} className="h-5 w-5 fill-amber-400 text-amber-400" />

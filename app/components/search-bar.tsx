@@ -28,13 +28,13 @@ export function SearchBar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const searchRef = useRef<HTMLDivElement>(null)
 
-  // inicializar o termo de busca da URL
+ 
   useEffect(() => {
     const query = searchParams.get("q")
     if (query) setSearchTerm(query)
   }, [searchParams])
 
-  // Buscar produtos via API
+  
   useEffect(() => {
     const delayDebounce = setTimeout(async () => {
       if (searchTerm.trim().length > 1) {
@@ -124,7 +124,7 @@ export function SearchBar() {
         </div>
       </form>
 
-      {/*Resultados Dropdown*/}
+      
       {isDropdownOpen && filteredProdutos.length > 0 && (
         <Card className="absolute top-full left-0 right-0 mt-1 z-50 max-h-[400px] overflow-auto">
           <CardContent className="p-0">

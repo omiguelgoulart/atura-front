@@ -36,11 +36,11 @@ export default function LoginPage() {
 
     console.log("Dados de Login:", { email, password });
     try {
-      // Simulação de sucesso e redirecionamento
+    
       setTimeout(() => {
         console.log("Simulando login bem-sucedido...");
         alert("Login (simulado) bem-sucedido! Redirecionando...");
-        // router.push('/'); // Redireciona para a home page após o login
+        
         setIsLoading(false);
       }, 1500);
 
@@ -82,7 +82,7 @@ export default function LoginPage() {
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Senha</Label>
                 <Link
-                  href="/senha" // ATUALIZADO AQUI
+                  href="/senha" 
                   className="text-sm font-medium text-primary hover:underline"
                 >
                   Esqueceu sua senha?
