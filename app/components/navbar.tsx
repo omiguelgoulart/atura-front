@@ -46,7 +46,7 @@ export default function Navbar() {
         {/* Carrinho (sempre à direita) */}
         <div className="flex-1 flex justify-end mr-6">
           <Button variant="outline" size="icon" asChild>
-            <Link href="/cart" className="relative">
+            <Link href="/carrinho" className="relative">
               <ShoppingCart className="h-5 w-5" />
               {totalItems > 0 && (
                 <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">

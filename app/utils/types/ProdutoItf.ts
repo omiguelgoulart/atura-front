@@ -8,7 +8,7 @@ export interface ProdutoItf {
     categoria: string
     estoque: number
     foto: string
-    tamanho: number
+    volumeMl: number
     marcaId: number
     marca: MarcaItf
     notas?: string[]

@@ -21,7 +21,7 @@ export function CardPerfume({ data }: { data: ProdutoItf }) {
         </CardContent>
         <CardFooter className="p-4 pt-0 flex justify-between items-center">
           <div className="font-bold text-base">R$ {data.preco.toFixed(2).replace(".", ",")}</div>
-          <div className="text-sm text-muted-foreground">{data.tamanho}ml</div>
+          <div className="text-sm text-muted-foreground">{data.volumeMl}ml</div>
         </CardFooter>
       </Card>
     </Link>

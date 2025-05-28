@@ -52,7 +52,7 @@ export default function ProdutoPage() {
 
           <div className="text-3xl font-bold">R$ {produto?.preco.toFixed(2).replace(".", ",")}</div>
           <div className="mt-2 text-muted-foreground">
-            {produto?.tamanho}ml • {produto?.categoria}
+            {produto?.volumeMl}ml • {produto?.categoria}
           </div>
 
           <div className="mt-4">
