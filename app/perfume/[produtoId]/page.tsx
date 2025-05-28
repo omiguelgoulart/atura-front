@@ -6,7 +6,6 @@ import { useParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { ProdutoItf } from "@/app/utils/types/ProdutoItf"
 
-
 export default function ProdutoPage() {
   const params = useParams()
   const [produto, setProduto] = useState<ProdutoItf>()
@@ -20,67 +19,64 @@ export default function ProdutoPage() {
     buscaDados()
   }, [])
 
-  
-
   return (
-    <div className="container py-8 md:py-12">
-      <div className="grid gap-8 md:grid-cols-2">
+    <div className="max-w-6xl mx-auto px-4 py-10">
+      <div className="grid md:grid-cols-2 gap-12">
         {/* IMAGEM */}
-        <div className="flex items-center justify-center">
-          <div className="relative aspect-square w-full max-w-[500px] overflow-hidden rounded-lg border">
+        <div className="flex justify-center items-start">
+          <div className="aspect-[3/4] w-full max-w-sm overflow-hidden rounded-lg border shadow-sm">
             <img
               src={produto?.foto || "/placeholder.svg"}
-              alt=""
-              className="object-cover"
+              alt={produto?.nome || "Produto"}
+              className="w-full h-full object-cover"
             />
           </div>
         </div>
 
         {/* DETALHES */}
-        <div className="flex flex-col gap-4">
-          <h1 className="text-3xl font-bold">{produto?.nome}</h1>
+        <div className="flex flex-col justify-between gap-6">
+          <div>
+            <h1 className="text-4xl font-semibold">{produto?.nome}</h1>
 
-          <div className="flex items-center gap-1">
-            {Array(Math.floor(4.5)) // Exemplo fixo
-              .fill(0)
-              .map((_, i) => (
-                <Star key={i} className="h-5 w-5 fill-amber-400 text-amber-400" />
-              ))}
-            {4.5 % 1 !== 0 && <StarHalf className="h-5 w-5 fill-amber-400 text-amber-400" />}
-            <span className="ml-2 text-sm text-muted-foreground">(4.5)</span>
+            <div className="flex items-center mt-2 gap-1">
+              {Array(Math.floor(4.5))
+                .fill(0)
+                .map((_, i) => (
+                  <Star key={i} className="w-5 h-5 text-amber-400 fill-amber-400" />
+                ))}
+              {4.5 % 1 !== 0 && <StarHalf className="w-5 h-5 text-amber-400 fill-amber-400" />}
+              <span className="ml-2 text-sm text-gray-500">(4.5)</span>
+            </div>
+
+            <div className="mt-4 text-3xl font-bold text-primary">R$ {produto?.preco.toFixed(2).replace(".", ",")}</div>
+            <p className="text-sm text-gray-500 mt-1">{produto?.volumeMl}ml • {produto?.categoria}</p>
           </div>
 
-          <div className="text-3xl font-bold">R$ {produto?.preco.toFixed(2).replace(".", ",")}</div>
-          <div className="mt-2 text-muted-foreground">
-            {produto?.volumeMl}ml • {produto?.categoria}
+          <div>
+            <h2 className="text-lg font-medium mb-2">Descrição</h2>
+            <p className="text-sm text-gray-600 leading-relaxed">{produto?.descricao}</p>
           </div>
 
-          <div className="mt-4">
-            <h3 className="text-lg font-medium mb-2">Descrição</h3>
-            <p className="text-muted-foreground">{produto?.descricao}</p>
-          </div>
-
-          <div className="mt-4">
-            <h3 className="text-lg font-medium mb-2">Notas</h3>
-            <div className="grid grid-cols-3 gap-4">
+          <div>
+            <h2 className="text-lg font-medium mb-2">Notas</h2>
+            <div className="grid grid-cols-3 gap-4 text-sm text-gray-600">
               <div>
-                <h4 className="font-medium">Topo</h4>
-                <p className="text-sm text-muted-foreground">Ex: Bergamota</p>
+                <h4 className="font-semibold">Topo</h4>
+                <p>Ex: Bergamota</p>
               </div>
               <div>
-                <h4 className="font-medium">Coração</h4>
-                <p className="text-sm text-muted-foreground">Ex: Jasmim</p>
+                <h4 className="font-semibold">Coração</h4>
+                <p>Ex: Jasmim</p>
               </div>
               <div>
-                <h4 className="font-medium">Base</h4>
-                <p className="text-sm text-muted-foreground">Ex: Cedro</p>
+                <h4 className="font-semibold">Base</h4>
+                <p>Ex: Cedro</p>
               </div>
             </div>
           </div>
 
-          <div className="mt-6">
-          {produto && <AddToCartButton perfume={produto} />}
-
+          <div>
+            {produto && <AddToCartButton perfume={produto} />}
           </div>
         </div>
       </div>
