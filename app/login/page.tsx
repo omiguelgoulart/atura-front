@@ -1,7 +1,6 @@
-// app/login/page.tsx
 "use client"
 
-import { useState, FormEvent } from "react";
+import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,42 +13,59 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
+type LoginItf = {
+  email: string;
+  password: string;
+};
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginItf>();
+
   const router = useRouter();
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault();
-    setIsLoading(true);
-    setError("");
-
-    if (!email || !password) {
-      setError("Por favor, preencha todos os campos.");
-      setIsLoading(false);
-      return;
-    }
-
-    console.log("Dados de Login:", { email, password });
+  async function handleLogin(data: LoginItf) {
     try {
-      // Simulação de sucesso e redirecionamento
-      setTimeout(() => {
-        console.log("Simulando login bem-sucedido...");
-        alert("Login (simulado) bem-sucedido! Redirecionando...");
-        // router.push('/'); // Redireciona para a home page após o login
-        setIsLoading(false);
-      }, 1500);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: data.email, senha: data.password }),
+      });
 
-    } catch (err: any) {
-      console.error("Erro no login:", err);
-      setError(err.message || "Ocorreu um erro ao tentar fazer login.");
-      setIsLoading(false);
+      if (response.status === 200) {
+        const dados = await response.json();
+        localStorage.setItem("token", dados.token);
+        toast.success("Login realizado!");
+        router.push("/");
+        return;
+      }
+
+      if (response.status === 401) {
+        toast.error("Email ou senha inválidos");
+        return;
+      }
+
+      if (response.status === 500) {
+        toast.error("Erro interno do servidor");
+        return;
+      }
+
+      if (!response.ok) {
+        const error = await response.json();
+        toast.error(error.message || "Erro ao fazer login");
+        return;
+      }
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
+      toast.error("Erro ao fazer login");
     }
-  };
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
@@ -63,26 +79,26 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(handleLogin)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
-                name="email"
                 type="email"
-                autoComplete="email"
-                required
                 placeholder="seu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={isLoading}
+                autoComplete="email"
+                {...register("email", { required: true })}
               />
+              {errors.email && (
+                <p className="text-sm text-destructive">Email é obrigatório</p>
+              )}
             </div>
+
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Senha</Label>
                 <Link
-                  href="/senha" // ATUALIZADO AQUI
+                  href="/password"
                   className="text-sm font-medium text-primary hover:underline"
                 >
                   Esqueceu sua senha?
@@ -90,21 +106,18 @@ export default function LoginPage() {
               </div>
               <Input
                 id="password"
-                name="password"
                 type="password"
-                autoComplete="current-password"
-                required
                 placeholder="********"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={isLoading}
+                autoComplete="current-password"
+                {...register("password", { required: true })}
               />
+              {errors.password && (
+                <p className="text-sm text-destructive">Senha é obrigatória</p>
+              )}
             </div>
-            {error && (
-              <p className="text-sm text-destructive">{error}</p>
-            )}
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Entrando..." : "Entrar"}
+
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? "Entrando..." : "Entrar"}
             </Button>
           </form>
         </CardContent>
