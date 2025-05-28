@@ -22,6 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from 'sonner'; // 1. Importar o toast do Sonner
 
 // Dados fictícios do usuário
 const initialMockUser = {
@@ -32,19 +33,31 @@ const initialMockUser = {
   joinDate: "15 de Janeiro, 2024",
   bio: "Entusiasta de tecnologia e apaixonado por soluções criativas. Sempre em busca de novos aprendizados e desafios no mundo do desenvolvimento.",
   phone: "(XX) XXXXX-XXXX",
-  _currentPasswordMock: "password123" // APENAS PARA SIMULAÇÃO LOCAL
+  _currentPasswordMock: "password123"
 };
 
-// Função auxiliar para validação de senha
+// Função auxiliar para validação de senha ATUALIZADA
 const getPasswordChangeErrors = (newPassword: string, confirmPassword: string): string[] => {
   const errors: string[] = [];
   if (newPassword.length < 8) {
     errors.push("A nova senha deve ter pelo menos 8 caracteres.");
   }
+  if (!/[a-z]/.test(newPassword)) { // 2. Adicionada validação de minúscula
+    errors.push("Deve conter pelo menos uma letra minúscula.");
+  }
+  if (!/[A-Z]/.test(newPassword)) { // 2. Adicionada validação de maiúscula
+    errors.push("Deve conter pelo menos uma letra maiúscula.");
+  }
+  if (!/[0-9]/.test(newPassword)) { // 2. Adicionada validação de número
+    errors.push("Deve conter pelo menos um número.");
+  }
+  // Opcional: caractere especial
+  // if (!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
+  //   errors.push("Deve conter pelo menos um caractere especial.");
+  // }
   if (newPassword !== confirmPassword) {
     errors.push("A nova senha e a confirmação não coincidem.");
   }
-  // Adicione mais regras se desejar (maiúscula, número, etc.)
   return errors;
 };
 
@@ -53,13 +66,11 @@ export default function PerfilPage() {
   const router = useRouter();
   const [displayUser, setDisplayUser] = useState(initialMockUser);
 
-  // Estados para o modal de Edição de Perfil
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editName, setEditName] = useState(""); // Inicializado no useEffect
-  const [editBio, setEditBio] = useState("");   // Inicializado no useEffect
-  const [editPhone, setEditPhone] = useState(""); // Inicializado no useEffect
+  const [editName, setEditName] = useState("");
+  const [editBio, setEditBio] = useState("");
+  const [editPhone, setEditPhone] = useState("");
 
-  // Estados para o modal de Alteração de Senha
   const [isChangePasswordDialogOpen, setIsChangePasswordDialogOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -71,10 +82,10 @@ export default function PerfilPage() {
     setEditName(displayUser.name);
     setEditBio(displayUser.bio);
     setEditPhone(displayUser.phone);
-  }, [displayUser, isEditDialogOpen]); // Atualiza quando displayUser muda OU quando o modal de edição é aberto
+  }, [displayUser, isEditDialogOpen]);
 
   const handleLogout = () => {
-    alert("Logout simulado!");
+    toast.info("Logout simulado!"); // 3. Usando toast
     setDisplayUser(initialMockUser);
     router.push("/");
   };
@@ -88,7 +99,7 @@ export default function PerfilPage() {
       phone: editPhone,
     };
     setDisplayUser(updatedUser);
-    alert("Perfil atualizado com sucesso (simulação)!");
+    toast.success("Perfil atualizado com sucesso!"); // 3. Usando toast
     setIsEditDialogOpen(false);
   };
 
@@ -99,7 +110,7 @@ export default function PerfilPage() {
 
     if (!currentPassword) {
         currentFieldErrors.currentPassword = ["Senha atual é obrigatória."];
-    } else if (currentPassword !== displayUser._currentPasswordMock) { // SIMULAÇÃO - Verificação real no backend
+    } else if (currentPassword !== displayUser._currentPasswordMock) {
       currentFieldErrors.currentPassword = ["Senha atual incorreta (simulação)."];
     }
 
@@ -110,14 +121,13 @@ export default function PerfilPage() {
         currentFieldErrors.confirmNewPassword = ["Confirmação da nova senha é obrigatória."];
     }
     
+    // Validações de força e se as senhas batem
     const passwordValidationErrors = getPasswordChangeErrors(newPassword, confirmNewPassword);
     if (newPassword && passwordValidationErrors.length > 0) {
-        // Adiciona erros de força/comprimento ao campo newPassword
         const strengthErrors = passwordValidationErrors.filter(err => !err.includes("não coincidem"));
         if (strengthErrors.length > 0) {
             currentFieldErrors.newPassword = [...(currentFieldErrors.newPassword || []), ...strengthErrors];
         }
-        // Adiciona erro de não coincidência ao campo confirmNewPassword
         if (passwordValidationErrors.some(err => err.includes("não coincidem"))) {
             currentFieldErrors.confirmNewPassword = [...(currentFieldErrors.confirmNewPassword || []), "A nova senha e a confirmação não coincidem."];
         }
@@ -125,11 +135,12 @@ export default function PerfilPage() {
 
     if (Object.keys(currentFieldErrors).length > 0) {
       setChangePasswordFieldErrors(currentFieldErrors);
+      toast.error("Por favor, corrija os erros no formulário."); // 3. Usando toast para erro
       return;
     }
 
     console.log("Nova senha (simulação):", newPassword);
-    alert("Senha alterada com sucesso (simulação)!");
+    toast.success("Senha alterada com sucesso!"); // 3. Usando toast
     setDisplayUser(prev => ({ ...prev, _currentPasswordMock: newPassword }));
     setCurrentPassword("");
     setNewPassword("");
@@ -137,10 +148,10 @@ export default function PerfilPage() {
     setIsChangePasswordDialogOpen(false);
   };
 
-
   return (
     <div className="flex min-h-[calc(100vh-var(--header-height,4rem))] flex-col items-center justify-center bg-muted/20 p-4 py-8 md:p-8">
       <Card className="w-full max-w-2xl shadow-lg">
+        {/* CardHeader */}
         <CardHeader className="items-center text-center pb-6">
           <Avatar className="h-28 w-28 mb-4 border-2 border-primary/50">
             <AvatarImage src={displayUser.avatarUrl} alt={`Avatar de ${displayUser.name}`} />
@@ -156,8 +167,8 @@ export default function PerfilPage() {
 
         <Separator />
 
+        {/* CardContent */}
         <CardContent className="pt-6 px-6 md:px-8 space-y-8">
-          {/* Seções "Sobre Mim" e "Contato" */}
           {displayUser.bio && (
             <div className="space-y-2">
               <h3 className="text-xl font-semibold flex items-center">
@@ -224,12 +235,12 @@ export default function PerfilPage() {
               </DialogContent>
             </Dialog>
 
-            {/* Modal Alterar Senha - Verifique esta seção cuidadosamente */}
+            {/* Modal Alterar Senha */}
             <Dialog 
               open={isChangePasswordDialogOpen} 
               onOpenChange={(isOpen) => {
                 setIsChangePasswordDialogOpen(isOpen);
-                if (!isOpen) { // Limpar erros e campos ao fechar o modal
+                if (!isOpen) {
                   setChangePasswordFieldErrors({});
                   setCurrentPassword("");
                   setNewPassword("");
@@ -271,7 +282,6 @@ export default function PerfilPage() {
                         <p key={`confirm-${i}`} className="text-sm text-destructive">{err}</p>
                     ))}
                   </div>
-                  {/* Removido changePasswordError geral, pois os erros estão por campo */}
                   <DialogFooter>
                      <DialogClose asChild><Button type="button" variant="outline">Cancelar</Button></DialogClose>
                     <Button type="submit" disabled={!(currentPassword && newPassword && confirmNewPassword)}><Save className="mr-2 h-4 w-4" />Salvar Nova Senha</Button>
