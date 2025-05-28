@@ -14,56 +14,35 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useRouter } from 'next/navigation'; // Para redirecionamento
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(""); // Para exibir mensagens de erro
-  const [isLoading, setIsLoading] = useState(false); // Para feedback no botão
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
-    setError(""); // Limpa erros anteriores
+    setError("");
 
-    // Validação básica
     if (!email || !password) {
       setError("Por favor, preencha todos os campos.");
       setIsLoading(false);
       return;
     }
 
-    // Aqui você fará a chamada para sua API de login
     console.log("Dados de Login:", { email, password });
-
     try {
-      // Exemplo de chamada de API (substitua pela sua lógica real)
-      // const response = await fetch('/api/auth/login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ email, password }),
-      // });
-
-      // if (!response.ok) {
-      //   const errorData = await response.json();
-      //   throw new Error(errorData.message || 'Falha no login');
-      // }
-
-      // const data = await response.json();
-      // console.log('Login bem-sucedido:', data);
-
       // Simulação de sucesso e redirecionamento
-      // Em um cenário real, você receberia um token, guardaria em cookies/localStorage
-      // e então redirecionaria.
       setTimeout(() => {
         console.log("Simulando login bem-sucedido...");
+        alert("Login (simulado) bem-sucedido! Redirecionando...");
         // router.push('/'); // Redireciona para a home page após o login
-        alert("Login (simulado) bem-sucedido! Redirecionando..."); // Alerta temporário
         setIsLoading(false);
       }, 1500);
-
 
     } catch (err: any) {
       console.error("Erro no login:", err);
@@ -103,7 +82,7 @@ export default function LoginPage() {
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Senha</Label>
                 <Link
-                  href="/esqueceu-senha" // Crie esta página se necessário
+                  href="/senha" // ATUALIZADO AQUI
                   className="text-sm font-medium text-primary hover:underline"
                 >
                   Esqueceu sua senha?
@@ -133,7 +112,7 @@ export default function LoginPage() {
           <p className="text-sm text-muted-foreground">
             Não tem uma conta?{" "}
             <Link
-              href="/cadastro" // Crie esta página se necessário
+              href="/cadastro"
               className="font-medium text-primary hover:underline"
             >
               Cadastre-se

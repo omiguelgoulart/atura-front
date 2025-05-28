@@ -1,3 +1,4 @@
+// No seu arquivo Navbar.tsx (ex: app/components/Navbar.tsx ou similar)
 "use client"
 
 import Link from "next/link"
@@ -12,14 +13,14 @@ import LoginButton from "./LoginButton"; // Verifique este caminho
 import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
-  const { cart } = useCart()
+  const { cart } = useCart() // Certifique-se que useCart está configurado para lidar com o estado inicial
   const totalItems = cart.reduce((total, item) => total + item.quantity, 0)
   const [, setProduto] = useState<ProdutoItf[]>([])
 
   const pathname = usePathname();
 
   // Defina as rotas onde os elementos principais da Navbar (Search, Cart, Login) NÃO devem aparecer
-  const hideMainElementsRoutes = ['/login', '/cadastro', '/esqueceu-senha']; // Adicione outras rotas se necessário
+  const hideMainElementsRoutes = ['/login', '/cadastro', '/senha']; // ATUALIZADO AQUI
 
   // Verifique se a rota atual NÃO está na lista de hideMainElementsRoutes
   const showMainNavbarElements = !hideMainElementsRoutes.includes(pathname);
@@ -31,7 +32,7 @@ export default function Navbar() {
       setProduto(dados)
   }
   useEffect(() => {
-    buscaDados()
+    // buscaDados() // Comentado para evitar erros se a API não estiver pronta/necessária aqui
   }
   , [])
 
