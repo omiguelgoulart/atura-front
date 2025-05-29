@@ -1,7 +1,7 @@
 // components/Review/ReviewProduto.tsx
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Plus } from "lucide-react"
@@ -9,32 +9,18 @@ import { ReviewItf } from "@/app/utils/types/ReviewITF"
 import { FormReview } from "./review/FormReview"
 import { TabsReview } from "./review/TabsReview"
 
+// components/ReviewProduto.tsx
 interface ReviewProdutoProps {
   produtoId: number
+  avaliacoes: ReviewItf[]
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function ReviewProduto({produtoId}: ReviewProdutoProps) {
-  const [reviews, setReviews] = useState<ReviewItf[]>([])
+export function ReviewProduto({ produtoId, avaliacoes }: ReviewProdutoProps) {
+  const [reviews] = useState<ReviewItf[]>(avaliacoes || [])
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const fetchReviews = async () => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/avaliacoes`)
-      if (!response.ok) throw new Error("Erro ao buscar avaliações")
-      const data = await response.json()
-      setReviews(data)
-    } catch (error) {
-      console.error("Erro ao carregar avaliações:", error)
-    }
-  }
-
-  useEffect(() => {
-    fetchReviews()
-  }, [])
-
   const handleSuccess = () => {
-    fetchReviews()
+    // Aqui você poderia opcionalmente refazer o fetch ou apenas adicionar a nova avaliação localmente
     setIsModalOpen(false)
   }
 

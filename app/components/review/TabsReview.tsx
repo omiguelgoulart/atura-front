@@ -39,7 +39,7 @@ export function TabsReview({ reviews }: TabsReviewProps) {
               <div key={index} className="py-6 border-b border-gray-800 last:border-0">
                 <StarRating rating={review.nota} />
                 <div className="flex items-center gap-2 mt-2">
-                  <span className="font-medium text-gray-100">{review.clienteId.nome}</span>
+                  <span className="font-medium text-gray-100">{review.cliente?.nome}</span>
                   <span className="text-gray-500 text-sm">|</span>
                   <span className="text-gray-400 text-sm">
                     {new Date(review.date).toLocaleDateString("pt-BR", {

@@ -7,6 +7,7 @@ import { ReviewItf } from "@/app/utils/types/ReviewITF";
 import { Label } from "@/components/ui/label";
 import { InteractiveStarRating } from "./InteractiveStarRating";
 import { useClienteStore } from "@/app/context/ClienteContext";
+import { toast } from "sonner";
 
 interface FormReviewProps {
   onSuccess: () => void
@@ -19,6 +20,11 @@ export function FormReview({ onSuccess, produtoId }: FormReviewProps) {
   const nota = watch("nota")
 
   const onSubmitReview = async (data: ReviewItf) => {
+    if (!cliente?.id) {
+      console.error("Cliente não está logado")
+      toast.error("Você precisa estar logado para enviar uma avaliação")
+      return
+    }
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/avaliacoes`, {
         method: "POST",

@@ -1,3 +1,4 @@
+import { ClienteItf } from "./ClienteIf";
 
 export interface ReviewItf {
     id?: number;
@@ -6,4 +7,5 @@ export interface ReviewItf {
     date: string;
     produtoId: string;
     clienteId: number;
+    cliente?: ClienteItf;
 }
