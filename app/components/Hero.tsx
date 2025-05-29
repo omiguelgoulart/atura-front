@@ -20,7 +20,7 @@ export default function Hero() {
             Fragrâncias exclusivas que contam histórias e despertam emoções. Encontre o perfume que combina com você.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button className="bg-white text-black hover:bg-gray-200 px-8 py-6 rounded-full text-sm font-medium">
+            {/* <Button className="bg-white text-black hover:bg-gray-200 px-8 py-6 rounded-full text-sm font-medium">
               Explorar Coleção
             </Button>
             <Button
@@ -28,7 +28,7 @@ export default function Hero() {
               className="border-white text-white hover:bg-white/10 px-8 py-6 rounded-full text-sm font-medium"
             >
               Lançamentos
-            </Button>
+            </Button> */}
           </div>
         </div>
       </div>
