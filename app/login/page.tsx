@@ -1,10 +1,10 @@
 "use client"
 
-import { useForm } from "react-hook-form";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useForm } from "react-hook-form"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import {
   Card,
   CardContent,
@@ -12,26 +12,26 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+} from "@/components/ui/card"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { useClienteStore } from "../context/ClienteContext"
 
 type LoginItf = {
-  email: string;
-  password: string;
-};
+  email: string
+  password: string
+  manter?: boolean
+}
 
 export default function LoginPage() {
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginItf>();
-     
-    const { logaCliente } = useClienteStore()
+  } = useForm<LoginItf>()
 
-  const router = useRouter();
+  const { logaCliente } = useClienteStore()
+  const router = useRouter()
 
   async function handleLogin(data: LoginItf) {
     try {
@@ -39,36 +39,37 @@ export default function LoginPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: data.email, senha: data.password }),
-      });
+      })
 
       if (response.status === 200) {
-        const dados = await response.json();
-        localStorage.setItem("token", dados.token);
-        toast.success("Login realizado!");
-        router.push("/");
-        logaCliente(dados) // Atualiza o estado global com os dados do cliente
-        return;
+        const dados = await response.json()
+        localStorage.setItem("token", dados.token)
+        toast.success("Login realizado!")
+        logaCliente(dados)
+        router.push("/")
 
+        if (data.manter) {
+          localStorage.setItem("clienteKey", dados.id)
+        } else {
+          localStorage.removeItem("clienteKey")
+        }
       }
 
       if (response.status === 401) {
-        toast.error("Email ou senha inválidos");
-        return;
+        toast.error("Email ou senha inválidos")
       }
 
       if (response.status === 500) {
-        toast.error("Erro interno do servidor");
-        return;
+        toast.error("Erro interno do servidor")
       }
 
       if (!response.ok) {
-        const error = await response.json();
-        toast.error(error.message || "Erro ao fazer login");
-        return;
+        const error = await response.json()
+        toast.error(error.message || "Erro ao fazer login")
       }
     } catch (error) {
-      console.error("Erro ao fazer login:", error);
-      toast.error("Erro ao fazer login");
+      console.error("Erro ao fazer login:", error)
+      toast.error("Erro ao fazer login")
     }
   }
 
@@ -121,6 +122,19 @@ export default function LoginPage() {
               )}
             </div>
 
+            {/* Checkbox manter conectado */}
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="manter"
+                {...register("manter")}
+                className="h-4 w-4 border-gray-300 rounded"
+              />
+              <Label htmlFor="manter" className="text-sm text-muted-foreground">
+                Manter conectado
+              </Label>
+            </div>
+
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? "Entrando..." : "Entrar"}
             </Button>
@@ -139,5 +153,5 @@ export default function LoginPage() {
         </CardFooter>
       </Card>
     </div>
-  );
+  )
 }
