@@ -5,55 +5,7 @@ import { Button } from "@/components/ui/button"
 export default function Home() {
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="border-b border-gray-800">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <Link href="/" className="text-xl font-bold">
-              Atura
-            </Link>
-            <nav className="hidden md:flex items-center space-x-6">
-              <Link href="#" className="text-sm text-gray-300 hover:text-white transition-colors">
-                Novidades
-              </Link>
-              <Link href="#" className="text-sm text-gray-300 hover:text-white transition-colors">
-                Masculinos
-              </Link>
-              <Link href="#" className="text-sm text-gray-300 hover:text-white transition-colors">
-                Femininos
-              </Link>
-              <Link href="#" className="text-sm text-gray-300 hover:text-white transition-colors">
-                Marcas
-              </Link>
-              <Link href="#" className="text-sm text-gray-300 hover:text-white transition-colors">
-                Ofertas
-              </Link>
-            </nav>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="relative hidden md:block">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Buscar perfumes..."
-                className="bg-gray-900 border border-gray-800 rounded-full py-2 pl-10 pr-4 text-sm w-64 focus:outline-none focus:border-gray-700"
-              />
-            </div>
-            <button className="relative p-2">
-              <ShoppingCart className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1 bg-green-500 text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                0
-              </span>
-            </button>
-            <button className="bg-gray-800 text-white text-sm py-2 px-4 rounded-full hover:bg-gray-700 transition-colors">
-              Entrar
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Banner */}
+      
       <section className="relative h-[500px] overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-black z-10"></div>
         <div
@@ -220,94 +172,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-black border-t border-gray-800 py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="text-lg font-bold mb-4">Atura Perfumes</h3>
-              <p className="text-gray-400 text-sm">
-                Fragrâncias exclusivas que contam histórias e despertam emoções. Encontre o perfume que combina com
-                você.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4">Categorias</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li>
-                  <Link href="#" className="hover:text-white transition-colors">
-                    Perfumes Masculinos
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="hover:text-white transition-colors">
-                    Perfumes Femininos
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="hover:text-white transition-colors">
-                    Kits e Presentes
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="hover:text-white transition-colors">
-                    Lançamentos
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="hover:text-white transition-colors">
-                    Ofertas
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4">Institucional</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li>
-                  <Link href="#" className="hover:text-white transition-colors">
-                    Sobre Nós
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="hover:text-white transition-colors">
-                    Política de Privacidade
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="hover:text-white transition-colors">
-                    Termos de Uso
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="hover:text-white transition-colors">
-                    Trocas e Devoluções
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="hover:text-white transition-colors">
-                    Fale Conosco
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4">Atendimento</h4>
-              <p className="text-gray-400 text-sm mb-2">contato@atura.com.br</p>
-              <p className="text-gray-400 text-sm mb-4">(11) 99999-9999</p>
-              <p className="text-gray-400 text-sm">
-                Horário de atendimento: <br />
-                Segunda a Sexta, das 9h às 18h
-              </p>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-12 pt-8 text-center text-sm text-gray-400">
-            <p>© {new Date().getFullYear()} Atura Perfumes. Todos os direitos reservados.</p>
-          </div>
-        </div>
-      </footer>
+      </section>     
     </div>
   )
 }
