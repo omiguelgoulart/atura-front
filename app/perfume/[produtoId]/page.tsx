@@ -33,6 +33,7 @@ export default function ProdutoPage() {
           </div>
         </div>
 
+<<<<<<< HEAD
         {/* DETALHES */}
         <div className="flex flex-col justify-between gap-6">
           <div>
@@ -50,6 +51,20 @@ export default function ProdutoPage() {
 
             <div className="mt-4 text-3xl font-bold text-primary">R$ {produto?.preco.toFixed(2).replace(".", ",")}</div>
             <p className="text-sm text-gray-500 mt-1">{produto?.volumeMl}ml • {produto?.categoria}</p>
+=======
+        
+        <div className="flex flex-col gap-4">
+          <h1 className="text-3xl font-bold">{produto?.nome}</h1>
+
+          <div className="flex items-center gap-1">
+            {Array(Math.floor(4.5)) 
+              .fill(0)
+              .map((_, i) => (
+                <Star key={i} className="h-5 w-5 fill-amber-400 text-amber-400" />
+              ))}
+            {4.5 % 1 !== 0 && <StarHalf className="h-5 w-5 fill-amber-400 text-amber-400" />}
+            <span className="ml-2 text-sm text-muted-foreground">(4.5)</span>
+>>>>>>> 5745a66e91d226803c18c8558283e81c0aa65443
           </div>
 
           <div>

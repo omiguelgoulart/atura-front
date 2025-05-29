@@ -20,7 +20,7 @@ export default function SenhaPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault(); // Essencial para impedir o comportamento padrão do form
+    event.preventDefault(); 
     setIsLoading(true);
     setFieldErrors({});
     setSuccessMessage("");
@@ -39,7 +39,7 @@ export default function SenhaPage() {
       return;
     }
 
-    // ... (resto da lógica de submit)
+    
     console.log("Solicitação de redefinição de senha para:", email);
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
@@ -61,14 +61,14 @@ export default function SenhaPage() {
           <CardDescription>Digite seu e-mail para receber um link de redefinição.</CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Certifique-se que noValidate está aqui! */}
+          
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 name="email"
-                type="email" // Mantém para semântica e UX mobile
+                type="email" 
                 autoComplete="email"
                 placeholder="seu@email.com"
                 value={email}
