@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useClienteStore } from "../context/ClienteContext"
 
 type LoginItf = {
   email: string;
@@ -27,6 +28,8 @@ export default function LoginPage() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<LoginItf>();
+     
+    const { logaCliente } = useClienteStore()
 
   const router = useRouter();
 
@@ -43,7 +46,9 @@ export default function LoginPage() {
         localStorage.setItem("token", dados.token);
         toast.success("Login realizado!");
         router.push("/");
+        logaCliente(dados) // Atualiza o estado global com os dados do cliente
         return;
+
       }
 
       if (response.status === 401) {

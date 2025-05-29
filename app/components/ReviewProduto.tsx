@@ -10,10 +10,11 @@ import { FormReview } from "./review/FormReview"
 import { TabsReview } from "./review/TabsReview"
 
 interface ReviewProdutoProps {
-  avaliacao: ReviewItf;
+  produtoId: number
 }
 
-export function ReviewProduto({avaliacao}: ReviewProdutoProps) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function ReviewProduto({produtoId}: ReviewProdutoProps) {
   const [reviews, setReviews] = useState<ReviewItf[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -52,7 +53,7 @@ export function ReviewProduto({avaliacao}: ReviewProdutoProps) {
             <DialogHeader>
               <DialogTitle className="text-gray-100">Adicionar Comentário</DialogTitle>
             </DialogHeader>
-            <FormReview onSuccess={handleSuccess} />
+            <FormReview onSuccess={handleSuccess} produtoId={produtoId} />
           </DialogContent>
         </Dialog>
       </div>

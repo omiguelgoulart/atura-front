@@ -83,16 +83,13 @@ export default function ProdutoPage() {
       </div>
 
       {/* AVALIAÇÕES */}
-      {produto?.avaliacao && produto.avaliacao.length > 0 && (
-      <div className="mt-12 border-t pt-8">
-        <h2 className="text-2xl font-semibold mb-4">Avaliações</h2>
-        <div className="space-y-4">
-        {produto.avaliacao.map((av) => (
-          <ReviewProduto key={av.id} avaliacao={av} />
-        ))}
-        </div>
-      </div>
-      )}
+{produto && (
+  <div className="mt-12 border-t pt-8">
+    <h2 className="text-2xl font-semibold mb-4">Avaliações</h2>
+    <ReviewProduto produtoId={produto.id} />
+  </div>
+)}
+
     </div>
   )
 }

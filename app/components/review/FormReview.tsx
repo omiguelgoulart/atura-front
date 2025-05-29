@@ -6,69 +6,49 @@ import { Textarea } from "@/components/ui/textarea";
 import { ReviewItf } from "@/app/utils/types/ReviewITF";
 import { Label } from "@/components/ui/label";
 import { InteractiveStarRating } from "./InteractiveStarRating";
+import { useClienteStore } from "@/app/context/ClienteContext";
 
 interface FormReviewProps {
-  onSuccess: () => void;
+  onSuccess: () => void
+  produtoId: number
 }
 
-export function FormReview({ onSuccess }: FormReviewProps) {
-  const { register, handleSubmit, setValue, watch, reset } =
-    useForm<ReviewItf>();
-  const nota = watch("nota");
+export function FormReview({ onSuccess, produtoId }: FormReviewProps) {
+  const { register, handleSubmit, setValue, watch, reset } = useForm<ReviewItf>()
+  const { cliente } = useClienteStore()
+  const nota = watch("nota")
 
   const onSubmitReview = async (data: ReviewItf) => {
-    console.log("Dados da avaliação:", data);
     try {
-      // Obter o cliente do localStorage via contexto (exemplo)
-      const clienteStr = localStorage.getItem("cliente");
-      const cliente = clienteStr ? JSON.parse(clienteStr) : null;
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/avaliacoes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...data,
+          clienteId: cliente?.id,
+          produtoId,
+          date: new Date().toISOString(),
+        }),
+      })
 
-      // Obter o id do produto da rota
-      const url = window.location.pathname;
-      const produtoId = url.split("/").pop();
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_URL_API}/avaliacoes`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ...data,
-            clienteId: cliente?.id,
-            produtoId,
-            date: new Date().toISOString(),
-          }),
-        }
-      );
-
-      if (!response.ok) throw new Error("Erro ao enviar comentário");
-      onSuccess();
+      if (!response.ok) throw new Error("Erro ao enviar comentário")
+      onSuccess()
     } catch (error) {
-      console.error("Erro ao enviar avaliação:", error);
+      console.error("Erro ao enviar avaliação:", error)
     } finally {
-      reset();
+      reset()
     }
-  };
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmitReview)} className="space-y-4 mt-4">
       <div>
-        <Label className="text-gray-300 text-sm font-medium mb-1 block">
-          Avaliação
-        </Label>
-        <InteractiveStarRating
-          rating={nota}
-          onRatingChange={(value) => setValue("nota", value)}
-        />
+        <Label className="text-gray-300 text-sm font-medium mb-1 block">Avaliação</Label>
+        <InteractiveStarRating rating={nota} onRatingChange={(value) => setValue("nota", value)} />
       </div>
 
       <div>
-        <Label
-          htmlFor="comentario"
-          className="text-gray-300 text-sm font-medium mb-1 block"
-        >
-          Comentário
-        </Label>
+        <Label htmlFor="comentario" className="text-gray-300 text-sm font-medium mb-1 block">Comentário</Label>
         <Textarea
           {...register("comentario")}
           placeholder="Escreva seu comentário..."
@@ -95,5 +75,5 @@ export function FormReview({ onSuccess }: FormReviewProps) {
         </Button>
       </div>
     </form>
-  );
+  )
 }
