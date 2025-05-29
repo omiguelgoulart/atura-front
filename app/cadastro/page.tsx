@@ -1,7 +1,6 @@
-// app/cadastro/page.tsx
-"use client"
+"use client";
 
-import { useState, FormEvent } from "react";
+import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,7 +13,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 // Função para validar o formato do email
 const isValidEmail = (email: string): boolean => {
@@ -45,75 +45,47 @@ const getPasswordStrengthErrors = (password: string): string[] => {
   return errors;
 };
 
+type CadastroItf = {
+  name: string;
+  email: string;
+  senha: string;
+  confirmPassword: string;
+};
+
 export default function CadastroPage() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState(""); // Para erros gerais
-  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string[] }>({}); // Para erros específicos de campos
-  const [isLoading, setIsLoading] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    watch,
+  } = useForm<CadastroItf>();
   const router = useRouter();
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault();
-    setIsLoading(true);
-    setError("");
-    setFieldErrors({}); // Limpa erros de campo anteriores
-
-    let currentFieldErrors: { [key: string]: string[] } = {};
-
-    // Validações básicas de preenchimento
-    if (!name) currentFieldErrors.name = ["O nome é obrigatório."];
-    if (!email) currentFieldErrors.email = ["O email é obrigatório."];
-    if (!password) currentFieldErrors.password = ["A senha é obrigatória."];
-    if (!confirmPassword) currentFieldErrors.confirmPassword = ["A confirmação da senha é obrigatória."];
-
-    // Validação de formato de e-mail
-    if (email && !isValidEmail(email)) {
-      currentFieldErrors.email = [...(currentFieldErrors.email || []), "Formato de email inválido."];
-    }
-
-    // Validação de força da senha
-    if (password) {
-      const passwordErrors = getPasswordStrengthErrors(password);
-      if (passwordErrors.length > 0) {
-        currentFieldErrors.password = [...(currentFieldErrors.password || []), ...passwordErrors];
-      }
-    }
-
-    // Validação de confirmação de senha
-    if (password && confirmPassword && password !== confirmPassword) {
-      currentFieldErrors.confirmPassword = [...(currentFieldErrors.confirmPassword || []), "As senhas não coincidem."];
-    }
-
-    if (Object.keys(currentFieldErrors).length > 0) {
-      setFieldErrors(currentFieldErrors);
-      setIsLoading(false);
-      return;
-    }
-
-    // Se passou em todas as validações do cliente:
-    console.log("Dados de Cadastro Válidos:", { name, email, password });
-
+  async function handleCadastro(data: CadastroItf) {
+    console.log("Dados do cadastro:", data);
     try {
-      // Simulação de chamada de API
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simula delay da API
-
-      // const response = await fetch('/api/auth/register', { /* ... */ });
-      // if (!response.ok) { /* ... Lógica de erro da API ... */ }
-      // const data = await response.json();
-
-      alert("Cadastro (simulado) bem-sucedido! Você será redirecionado para o login.");
-      router.push('/login');
-
-    } catch (err: any) {
-      console.error("Erro no cadastro:", err);
-      setError(err.message || "Ocorreu um erro ao tentar se cadastrar.");
-    } finally {
-      setIsLoading(false);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL_API}/clientes`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+        nome: data.name,
+        email: data.email,
+        senha: data.senha,
+          }),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Erro ao cadastrar usuário");
+      }
+      toast.success("Cadastro realizado com sucesso!");
+      router.push("/login");
+    } catch (error) {
+      console.error("Erro ao cadastrar:", error);
+      toast.error("Erro ao cadastrar usuário");
     }
-  };
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
@@ -127,49 +99,113 @@ export default function CadastroPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(handleCadastro)} className="space-y-4">
             {/* Campo Nome */}
             <div className="space-y-2">
               <Label htmlFor="name">Nome Completo</Label>
-              <Input id="name" name="name" type="text" autoComplete="name" placeholder="Seu nome completo" value={name} onChange={(e) => setName(e.target.value)} disabled={isLoading} aria-invalid={!!fieldErrors.name} aria-describedby="name-error"/>
-              {fieldErrors.name && fieldErrors.name.map((err, i) => <p key={i} id="name-error" className="text-sm text-destructive">{err}</p>)}
+              <Input
+                id="name"
+                type="text"
+                placeholder="Seu nome completo"
+                {...register("name", {
+                  required: "O nome é obrigatório.",
+                  minLength: {
+                    value: 3,
+                    message: "O nome deve ter pelo menos 3 caracteres.",
+                  },
+                })}
+              />
+              {errors.name && (
+                <p className="text-sm text-destructive">{errors.name.message}</p>
+              )}
             </div>
 
             {/* Campo Email */}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" type="email" autoComplete="email" placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} disabled={isLoading} aria-invalid={!!fieldErrors.email} aria-describedby="email-error"/>
-              {fieldErrors.email && fieldErrors.email.map((err, i) => <p key={i} id="email-error" className="text-sm text-destructive">{err}</p>)}
+              <Input
+                id="email"
+                type="email"
+                placeholder="seu@email.com"
+                autoComplete="email"
+                {...register("email", {
+                  required: "O email é obrigatório.",
+                  validate: (value) =>
+                    isValidEmail(value) || "Formato de email inválido.",
+                })}
+              />
+              {errors.email && (
+                <p className="text-sm text-destructive">{errors.email.message}</p>
+              )}
             </div>
 
             {/* Campo Senha */}
             <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
-              <Input id="password" name="password" type="password" autoComplete="new-password" placeholder="********" value={password} onChange={(e) => setPassword(e.target.value)} disabled={isLoading} aria-invalid={!!fieldErrors.password} aria-describedby="password-error"/>
-              {fieldErrors.password && fieldErrors.password.map((err, i) => <p key={i} id="password-error" className="text-sm text-destructive">{err}</p>)}
+              <Label htmlFor="senha">Senha</Label>
+              <Input
+                id="senha"
+                type="senha"
+                placeholder="********"
+                autoComplete="nova-senha"
+                {...register("senha", {
+                  required: "A senha é obrigatória.",
+                  validate: (value) => {
+                    const passwordErrors = getPasswordStrengthErrors(value);
+                    return passwordErrors.length === 0
+                      ? true
+                      : passwordErrors.join(" ");
+                  },
+                })}
+              />
+              {errors.senha && (
+                <p className="text-sm text-destructive">{errors.senha.message}</p>
+              )}
             </div>
 
             {/* Campo Confirmar Senha */}
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirmar Senha</Label>
-              <Input id="confirmPassword" name="confirmPassword" type="password" autoComplete="new-password" placeholder="********" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={isLoading} aria-invalid={!!fieldErrors.confirmPassword} aria-describedby="confirmPassword-error"/>
-              {fieldErrors.confirmPassword && fieldErrors.confirmPassword.map((err, i) => <p key={i} id="confirmPassword-error" className="text-sm text-destructive">{err}</p>)}
+              <Input
+              id="confirmPassword"
+              type="password"
+              placeholder="********"
+              autoComplete="new-password"
+              {...register("confirmPassword", {
+                required: "A confirmação da senha é obrigatória.",
+                validate: (value) =>
+                  value === watch("senha") || "As senhas não coincidem.",
+              })}
+              />
+              {errors.confirmPassword && (
+              <p className="text-sm text-destructive">
+                {errors.confirmPassword.message}
+              </p>
+              )}
             </div>
 
             {/* Erro Geral */}
-            {error && (
-              <p className="text-sm text-destructive">{error}</p>
+            {Object.values(errors).length > 0 && (
+              <div className="text-sm text-destructive">
+                {Object.entries(errors).map(([field, error]) =>
+                  error?.message ? (
+                    <p key={field}>{error.message}</p>
+                  ) : null
+                )}
+              </div>
             )}
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Cadastrando..." : "Criar Conta"}
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? "Cadastrando..." : "Criar Conta"}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col items-center space-y-2">
           <p className="text-sm text-muted-foreground">
             Já tem uma conta?{" "}
-            <Link href="/login" className="font-medium text-primary hover:underline">
+            <Link
+              href="/login"
+              className="font-medium text-primary hover:underline"
+            >
               Faça login
             </Link>
           </p>
@@ -178,3 +214,5 @@ export default function CadastroPage() {
     </div>
   );
 }
+
+
