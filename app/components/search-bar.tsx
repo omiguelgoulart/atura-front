@@ -74,9 +74,15 @@ export function SearchBar() {
   }
 
   const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsDropdownOpen(false)
+  e.preventDefault()
+  setIsDropdownOpen(false)
 
+  if (filteredProdutos.length > 0) {
+    // Redireciona para o primeiro produto encontrado
+    router.push(`/perfume/${filteredProdutos[0].id}`)
+    setSearchTerm("")
+  } else {
+    // Fallback: comportamento padrão (opcional)
     if (pathname === "/") {
       const params = new URLSearchParams(searchParams.toString())
       if (searchTerm) {
@@ -84,11 +90,13 @@ export function SearchBar() {
       } else {
         params.delete("q")
       }
-      router.push(`/${params.toString()}`)
+      router.push(`/?${params.toString()}`)
     } else {
       router.push(`/${encodeURIComponent(searchTerm)}`)
     }
   }
+}
+
 
   const handleSearchFocus = () => {
     if (filteredProdutos.length > 0) setIsDropdownOpen(true)
