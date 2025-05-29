@@ -1,19 +1,18 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useForm, Controller } from "react-hook-form"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { FilterIcon } from "lucide-react"
-import {  Sheet,  SheetContent,  SheetHeader,  SheetTitle,  SheetTrigger,  SheetClose} from "@/components/ui/sheet"
-import { ProdutoItf } from "../utils/types/ProdutoItf"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import type { ProdutoItf } from "../utils/types/ProdutoItf"
 
 interface FiltersSidebarProps {
-  onReset: () => void
+  produtos: ProdutoItf[]
   isMobile?: boolean
-  maxPrice: number
 }
 
 interface FormValues {
@@ -21,132 +20,131 @@ interface FormValues {
   types: string[]
 }
 
-export default function Sidebar({
-  onReset,
-  isMobile = false,
-  
-}: FiltersSidebarProps) {
-  const [produtos, setProdutos] = useState<ProdutoItf[]>([])
+export default function Sidebar({ produtos, isMobile = false }: FiltersSidebarProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
 
-  const { control, handleSubmit, reset } = useForm<FormValues>({
-    defaultValues: { brandIds: [], types: [] }
+  const { control, handleSubmit, reset, getValues } = useForm<FormValues>({
+    defaultValues: { brandIds: [], types: [] },
   })
 
+  // Initialize form with URL params only once
   useEffect(() => {
-    async function fetchProdutos() {
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/produtos`)
-        const data: ProdutoItf[] = await response.json()
-        setProdutos(data)
-      } catch (error) {
-        console.error("Erro ao buscar produtos:", error)
-      }
+    const marcaParam = searchParams.get("marca")
+    const tipoParam = searchParams.get("tipo")
+
+    const initialValues: FormValues = {
+      brandIds: marcaParam ? marcaParam.split(",").map(Number) : [],
+      types: tipoParam ? tipoParam.split(",") : [],
     }
 
-    fetchProdutos()
-  }, [])
+    reset(initialValues)
+  }, [searchParams, reset])
 
-  
-  const marcasUnicas = Array.from(
-    new Map(produtos.map((p) => [p.marca.id, p.marca])).values()
-  )
-
+  const marcasUnicas = Array.from(new Map(produtos.map((p) => [p.marca.id, p.marca])).values())
   const categoriasUnicas = Array.from(new Set(produtos.map((p) => p.categoria)))
 
   const onSubmit = (data: FormValues) => {
     const params = new URLSearchParams()
 
     if (data.brandIds.length > 0) {
-      
-      params.set("marca", String(data.brandIds[0]))
+      params.set("marca", data.brandIds.join(","))
     }
     if (data.types.length > 0) {
-      params.set("tipo", data.types[0])
+      params.set("tipo", data.types.join(","))
     }
 
-    router.push(`/?${params.toString()}`)
+    const newUrl = params.toString() ? `/?${params.toString()}` : "/"
+    router.push(newUrl)
+  }
+
+  const handleReset = () => {
+    reset({ brandIds: [], types: [] })
+    router.push("/")
+  }
+
+  const getActiveFiltersCount = () => {
+    const values = getValues()
+    return values.brandIds.length + values.types.length
   }
 
   const FiltersContent = () => (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-     
-      <div>
-        <h3 className="text-lg font-medium mb-3">Marcas</h3>
-        <div className="space-y-2">
-          {marcasUnicas.map((marca) => (
-            <Controller
-              key={marca.id}
-              name="brandIds"
-              control={control}
-              render={({ field }) => {
-                const value: number[] = field.value || []
-                return (
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`brand-${marca.id}`}
-                      checked={value.includes(marca.id)}
-                      onCheckedChange={(checked) => {
-                        field.onChange(
-                          checked
-                            ? [...value, marca.id]
-                            : value.filter((id) => id !== marca.id)
-                        )
-                      }}
-                    />
-                    <Label htmlFor={`brand-${marca.id}`} className="text-sm font-normal cursor-pointer">
-                      {marca.nome}
-                    </Label>
-                  </div>
-                )
-              }}
-            />
-          ))}
+    <div className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {/* Marcas Filter */}
+        <div>
+          <h3 className="text-lg font-medium mb-3">Marcas</h3>
+          <div className="space-y-2 max-h-48 overflow-y-auto">
+            {marcasUnicas.map((marca) => (
+              <Controller
+                key={marca.id}
+                name="brandIds"
+                control={control}
+                render={({ field }) => {
+                  const value: number[] = field.value || []
+                  return (
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`brand-${marca.id}`}
+                        checked={value.includes(marca.id)}
+                        onCheckedChange={(checked) => {
+                          const newValue = checked ? [...value, marca.id] : value.filter((id) => id !== marca.id)
+                          field.onChange(newValue)
+                        }}
+                      />
+                      <Label htmlFor={`brand-${marca.id}`} className="text-sm font-normal cursor-pointer flex-1">
+                        {marca.nome}
+                      </Label>
+                    </div>
+                  )
+                }}
+              />
+            ))}
+          </div>
         </div>
-      </div>
 
-     
-      <div>
-        <h3 className="text-lg font-medium mb-3">Categoria</h3>
-        <div className="space-y-2">
-          {categoriasUnicas.map((categoria) => (
-            <Controller
-              key={categoria}
-              name="types"
-              control={control}
-              render={({ field }) => {
-                const value: string[] = field.value || []
-                return (
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`type-${categoria}`}
-                      checked={value.includes(categoria)}
-                      onCheckedChange={(checked) => {
-                        field.onChange(
-                          checked
-                            ? [...value, categoria]
-                            : value.filter((t) => t !== categoria)
-                        )
-                      }}
-                    />
-                    <Label htmlFor={`type-${categoria}`} className="text-sm font-normal cursor-pointer">
-                      {categoria}
-                    </Label>
-                  </div>
-                )
-              }}
-            />
-          ))}
+        {/* Categorias Filter */}
+        <div>
+          <h3 className="text-lg font-medium mb-3">Categoria</h3>
+          <div className="space-y-2">
+            {categoriasUnicas.map((categoria) => (
+              <Controller
+                key={categoria}
+                name="types"
+                control={control}
+                render={({ field }) => {
+                  const value: string[] = field.value || []
+                  return (
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`type-${categoria}`}
+                        checked={value.includes(categoria)}
+                        onCheckedChange={(checked) => {
+                          const newValue = checked ? [...value, categoria] : value.filter((t) => t !== categoria)
+                          field.onChange(newValue)
+                        }}
+                      />
+                      <Label htmlFor={`type-${categoria}`} className="text-sm font-normal cursor-pointer flex-1">
+                        {categoria}
+                      </Label>
+                    </div>
+                  )
+                }}
+              />
+            ))}
+          </div>
         </div>
-      </div>
 
-      <Button variant="outline" type="button" onClick={() => { reset(); onReset(); }} className="w-full">
-        Limpar Filtros
-      </Button>
-      <Button type="submit" className="w-full">
-        Aplicar Filtros
-      </Button>
-    </form>
+        <div className="flex gap-2">
+          <Button variant="outline" type="button" onClick={handleReset} className="flex-1">
+            Limpar
+          </Button>
+          <Button type="submit" className="flex-1">
+            Aplicar
+          </Button>
+        </div>
+      </form>
+    </div>
   )
 
   if (isMobile) {
@@ -163,11 +161,15 @@ export default function Sidebar({
             <SheetTitle>Filtros</SheetTitle>
           </SheetHeader>
           <FiltersContent />
-          <SheetClose asChild />
         </SheetContent>
       </Sheet>
     )
   }
 
-  return <FiltersContent />
+  return (
+    <div className="space-y-4">
+      <h2 className="text-xl font-semibold">Filtros</h2>
+      <FiltersContent />
+    </div>
+  )
 }
