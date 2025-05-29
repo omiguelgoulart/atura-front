@@ -86,7 +86,10 @@ export default function ProdutoPage() {
 {produto && (
   <div className="mt-12 border-t pt-8">
     <h2 className="text-2xl font-semibold mb-4">Avaliações</h2>
-    <ReviewProduto produtoId={produto.id} avaliacoes={produto.avaliacao || []} />
+    <ReviewProduto 
+      produtoId={produto.id} 
+      avaliacoes={Array.isArray(produto.avaliacao) ? produto.avaliacao : []} 
+    />
   </div>
 )}
 
