@@ -8,6 +8,7 @@ import { Plus } from "lucide-react"
 import { ReviewItf } from "@/app/utils/types/ReviewITF"
 import { FormReview } from "./review/FormReview"
 import { TabsReview } from "./review/TabsReview"
+import { useRouter } from "next/navigation"
 
 // components/ReviewProduto.tsx
 interface ReviewProdutoProps {
@@ -18,9 +19,11 @@ interface ReviewProdutoProps {
 export function ReviewProduto({ produtoId, avaliacoes }: ReviewProdutoProps) {
   const [reviews] = useState<ReviewItf[]>(avaliacoes || [])
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const router = useRouter()
 
   const handleSuccess = () => {
-    // Aqui você poderia opcionalmente refazer o fetch ou apenas adicionar a nova avaliação localmente
+      router.refresh();
+      
     setIsModalOpen(false)
   }
 

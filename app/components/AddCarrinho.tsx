@@ -46,6 +46,7 @@ export default function AddCarrinho({
       }
 
       toast.success("Produto adicionado ao carrinho!")
+      router.refresh();
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message)

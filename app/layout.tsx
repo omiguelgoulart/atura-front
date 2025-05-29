@@ -52,7 +52,7 @@ export default function RootLayout({
               </footer>
             </div>
           </CartProvider>
-          <Toaster richColors position="top-right" /> 
+          <Toaster richColors position="bottom-right" /> 
           <Suspense fallback={null}>
             <WhatsAppFab />
           </Suspense>

@@ -58,31 +58,41 @@ export default function CadastroPage() {
   } = useForm<CadastroItf>();
   const router = useRouter();
 
-  async function handleCadastro(data: CadastroItf) {
-    console.log("Dados do cadastro:", data);
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_URL_API}/clientes`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-        nome: data.name,
-        email: data.email,
-        senha: data.senha,
-          }),
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Erro ao cadastrar usuário");
+async function handleCadastro(data: CadastroItf) {
+  console.log("Dados do cadastro:", data);
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_URL_API}/clientes`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nome: data.name,
+          email: data.email,
+          senha: data.senha,
+        }),
       }
-      toast.success("Cadastro realizado com sucesso!");
-      router.push("/login");
-    } catch (error) {
-      console.error("Erro ao cadastrar:", error);
-      toast.error("Erro ao cadastrar usuário");
+    );
+
+    if (!response.ok) {
+      const erro = await response.json();
+      // Se o backend retornar o erro de e-mail já cadastrado
+      if (erro.erro === "E-mail já cadastrado no sistema") {
+        toast.error(erro.erro);
+      } else {
+        toast.error("Erro ao cadastrar usuário");
+      }
+      return;
     }
+
+    toast.success("Cadastro realizado com sucesso!");
+    router.push("/login");
+
+  } catch (error) {
+    console.error("Erro ao cadastrar:", error);
+    toast.error("Erro ao cadastrar usuário");
   }
+}
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
@@ -141,7 +151,7 @@ export default function CadastroPage() {
               <Label htmlFor="senha">Senha</Label>
               <Input
                 id="senha"
-                type="senha"
+                type="password"
                 placeholder="********"
                 autoComplete="nova-senha"
                 {...register("senha", {

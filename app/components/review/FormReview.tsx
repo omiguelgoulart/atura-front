@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { InteractiveStarRating } from "./InteractiveStarRating";
 import { useClienteStore } from "@/app/context/ClienteContext";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface FormReviewProps {
   onSuccess: () => void
@@ -18,6 +19,7 @@ export function FormReview({ onSuccess, produtoId }: FormReviewProps) {
   const { register, handleSubmit, setValue, watch, reset } = useForm<ReviewItf>()
   const { cliente } = useClienteStore()
   const nota = watch("nota")
+  const router = useRouter()
 
   const onSubmitReview = async (data: ReviewItf) => {
     if (!cliente?.id) {
@@ -36,6 +38,9 @@ export function FormReview({ onSuccess, produtoId }: FormReviewProps) {
           date: new Date().toISOString(),
         }),
       })
+
+      toast.success("Avaliação enviada com sucesso!")
+      router.refresh();
 
       if (!response.ok) throw new Error("Erro ao enviar comentário")
       onSuccess()
