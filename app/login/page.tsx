@@ -32,21 +32,11 @@ export default function LoginPage() {
 
   async function handleLogin(data: LoginItf) {
     try {
-<<<<<<< HEAD
       const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: data.email, senha: data.password }),
       });
-=======
-    
-      setTimeout(() => {
-        console.log("Simulando login bem-sucedido...");
-        alert("Login (simulado) bem-sucedido! Redirecionando...");
-        
-        setIsLoading(false);
-      }, 1500);
->>>>>>> 5745a66e91d226803c18c8558283e81c0aa65443
 
       if (response.status === 200) {
         const dados = await response.json();
@@ -108,11 +98,7 @@ export default function LoginPage() {
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Senha</Label>
                 <Link
-<<<<<<< HEAD
                   href="/password"
-=======
-                  href="/senha" 
->>>>>>> 5745a66e91d226803c18c8558283e81c0aa65443
                   className="text-sm font-medium text-primary hover:underline"
                 >
                   Esqueceu sua senha?
