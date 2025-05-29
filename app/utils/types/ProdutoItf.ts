@@ -1,4 +1,5 @@
 import { MarcaItf } from "./MarcaItf"
+import { ReviewItf } from "./ReviewITF"
 
 export interface ProdutoItf {
     id: number
@@ -12,6 +13,6 @@ export interface ProdutoItf {
     marcaId: number
     marca: MarcaItf
     notas?: string[]
-    avaliacao?: number;
+    avaliacao?: ReviewItf[];
   }
   
