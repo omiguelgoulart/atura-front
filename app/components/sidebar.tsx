@@ -24,7 +24,7 @@ export default function Sidebar({ produtos, isMobile = false }: FiltersSidebarPr
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const { control, handleSubmit, reset, getValues } = useForm<FormValues>({
+  const { control, handleSubmit, reset } = useForm<FormValues>({
     defaultValues: { brandIds: [], types: [] },
   })
 
@@ -61,11 +61,6 @@ export default function Sidebar({ produtos, isMobile = false }: FiltersSidebarPr
   const handleReset = () => {
     reset({ brandIds: [], types: [] })
     router.push("/")
-  }
-
-  const getActiveFiltersCount = () => {
-    const values = getValues()
-    return values.brandIds.length + values.types.length
   }
 
   const FiltersContent = () => (
