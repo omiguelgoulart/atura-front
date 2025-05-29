@@ -1,4 +1,3 @@
-// app/senha/page.tsx
 "use client"
 
 import { useState, FormEvent } from "react";
