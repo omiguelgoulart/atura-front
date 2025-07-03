@@ -1,64 +1,63 @@
-"use client"
+"use client";
 
-import { useClienteStore } from "@/app/context/ClienteContext"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { toast } from "sonner"
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/app/login/stores/authStore";
 
-interface AddProdutoCarrinhoProps {
-  produtoId: number
-  quantidade?: number
-  
+type Produto = {
+  id: number;
+  nome: string;
+  preco: number;
+  foto?: string | null;
+};
+
+type AddCarrinhoItem = {
+  produtoId: number;
+  quantidade: number;
+  preco_unitario: number;
+  clienteId: string;
+  produto: Produto;
+};
+
+interface AddCarrinhoProps {
+  produto: Produto;
+  quantidade?: number;
 }
 
-export default function AddCarrinho({
-  produtoId,
-  quantidade = 1,
-}: AddProdutoCarrinhoProps) {
-  const { cliente } = useClienteStore()
-  const router = useRouter()
+export default function AddCarrinho({ produto, quantidade = 1 }: AddCarrinhoProps) {
+  const router = useRouter();
+  const { user, clienteLogado } = useAuthStore();
 
-  const adicionarAoCarrinho = async () => {
-    if (!cliente || !cliente.id) {
-      toast.warning("Você precisa estar logado para adicionar ao carrinho.")
-      router.push("/login")
-      return
+  const handleAdd = () => {
+    if (!clienteLogado() || !user?.id) {
+      toast.warning("Faça login para adicionar ao carrinho.");
+      return router.push("/login");
     }
 
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/carrinho`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // você pode adicionar token se ainda for necessário para autenticação no backend
-        },
-        body: JSON.stringify({
-          produtoId,
-          quantidade,
-          clienteId: cliente.id, // envio opcional, caso necessário no backend
-        }),
-      })
+    const key = "carrinho";
+    const atual: AddCarrinhoItem[] = JSON.parse(localStorage.getItem(key) || "[]");
 
-      const res = await response.json()
+    const index = atual.findIndex((i) => i.produtoId === produto.id);
 
-      if (!response.ok) {
-        throw new Error(res.error || "Erro ao adicionar ao carrinho")
-      }
-
-      toast.success("Produto adicionado ao carrinho!")
-      router.refresh();
-    } catch (error) {
-      if (error instanceof Error) {
-        toast.error(error.message)
-      } else {
-        toast.error("Erro desconhecido ao adicionar ao carrinho")
-      }
+    if (index >= 0) {
+      atual[index].quantidade += quantidade;
+    } else {
+      atual.push({
+        produtoId: produto.id,
+        quantidade,
+        preco_unitario: produto.preco,
+        clienteId: user.id,
+        produto,
+      });
     }
-  }
 
-  return (
-    <Button onClick={adicionarAoCarrinho} className="w-full">
-      Adicionar ao carrinho
-    </Button>
-  )
+    localStorage.setItem(key, JSON.stringify(atual));
+    setTimeout(() => {
+      console.log("Carrinho salvo", localStorage.getItem(key));
+    }, 500);
+    toast.success("Produto adicionado ao carrinho!");
+  };
+
+  return <Button onClick={handleAdd}>Adicionar ao carrinho</Button>;
 }

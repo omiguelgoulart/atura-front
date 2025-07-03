@@ -18,7 +18,7 @@ interface Produto {
   }
 }
 
-export function SearchBar() {
+export function InputPesquisa() {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()

@@ -1,6 +1,7 @@
-import { ProdutoItf } from "./ProdutoItf";
+import  ProdutoITF  from "./ProdutoItf";
 
-export interface CarrinhoItf {
+
+export interface Carrinho {
   id: number;
   status: "CARRINHO" | "PEDIDO" | "FINALIZADO";
   quantidade: number;
@@ -10,5 +11,5 @@ export interface CarrinhoItf {
   pedidoId: number | null;
   criadoEm: string;
   atualizadoEm: string;
-  produto: ProdutoItf;
+  produto: ProdutoITF;
 }

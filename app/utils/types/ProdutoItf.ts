@@ -1,27 +1,20 @@
-// ./utils/types/ProdutoItf.ts
-import { MarcaItf } from "./MarcaItf";
+import { Avaliacao } from "./AvaliacaoItf";
 
-// Defina FotoItf conforme a estrutura da sua tabela de Fotos
-export interface FotoItf {
+export interface Marca {
   id: number;
-  url: string;
-  // ... quaisquer outros campos relevantes da foto
+  nome: string;
 }
 
-export interface ProdutoItf {
+export type CategoriaProduto = "MASCULINO" | "FEMININO" | "INFANTIL" | "UNISSEX";
+export default interface Produto {
   id: number;
   nome: string;
   descricao: string;
   preco: number;
-  categoria: string;
+  categoria: CategoriaProduto; // <- alterado aqui
   estoque: number;
-  foto: string;        // URL da foto principal
-  volumeMl?: number;   // Opcional
-  marcaId: number;
-  marca: MarcaItf;
-  fotos?: FotoItf[];   // Opcional, pois /produtos/filtro pode não incluir
-  notas?: string[];
-  avaliacao?: number;
-  // createdAt?: string | Date; // Se for usar
-  // updatedAt?: string | Date; // Se for usar
+  volumeMl: number;
+  foto: string;
+  marca: Marca;
+  avaliacao: Avaliacao[];
 }

@@ -1,110 +1,90 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useMemo } from "react"
-import { useSearchParams } from "next/navigation"
-import { CardPerfume } from "./components/perfume-grid"
-import FiltersSidebar from "./components/sidebar"
-import type { ProdutoItf } from "./utils/types/ProdutoItf"
-import Hero from "./components/Hero"
+import { useEffect, useMemo, useState } from "react";
+import { useProdutos } from "./stores/useProduto";
+import { CardPerfume } from "./components/CardPerfume";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { ProdutoSidebar } from "./components/Sidebar";
 
-export default function Home() {
-  const [produtos, setProdutos] = useState<ProdutoItf[]>([])
-  const [loading, setLoading] = useState(true)
-  const searchParams = useSearchParams()
+export default function PerfumePage() {
+  const { produtos, carregarProdutos, filtrarProdutos, loading } = useProdutos();
+
+  const [filtros, setFiltros] = useState({
+    marca: "all",
+    categoria: "all",
+    precoMinimo: "",
+    precoMaximo: "",
+  });
 
   useEffect(() => {
-    async function buscaDados() {
-      try {
-        setLoading(true)
-        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/produtos`)
-        const dados = await response.json()
-        setProdutos(dados)
-      } catch (error) {
-        console.error("Erro ao buscar produtos:", error)
-      } finally {
-        setLoading(false)
-      }
-    }
-    buscaDados()
-  }, [])
+    carregarProdutos();
+  }, [carregarProdutos]);
 
-  // Filter products based on URL params
-  const filteredProdutos = useMemo(() => {
-    const marcaParam = searchParams.get("marca")
-    const tipoParam = searchParams.get("tipo")
+  const marcas = useMemo(() => {
+    const mapa = new Map();
+    produtos.forEach((p) => {
+      if (p.marca) mapa.set(p.marca.id.toString(), p.marca.nome);
+    });
+    return Array.from(mapa.entries()).map(([id, nome]) => ({ id, nome }));
+  }, [produtos]);
 
-    if (!marcaParam && !tipoParam) {
-      return produtos
-    }
+  const categorias = useMemo(() => {
+    return Array.from(new Set(produtos.map((p) => p.categoria))).filter(Boolean);
+  }, [produtos]);
 
-    return produtos.filter((produto) => {
-      const marcaIds = marcaParam ? marcaParam.split(",").map(Number) : []
-      const tipos = tipoParam ? tipoParam.split(",") : []
+  const handleFiltroChange = (campo: string, valor: string) => {
+    setFiltros((prev) => ({ ...prev, [campo]: valor }));
+  };
 
-      const matchesBrand = marcaIds.length === 0 || marcaIds.includes(produto.marca.id)
-      const matchesType = tipos.length === 0 || tipos.includes(produto.categoria)
+  const handleAplicarFiltros = () => {
+    filtrarProdutos({
+      marcaId: filtros.marca !== "all" ? filtros.marca : undefined,
+      categoria: filtros.categoria !== "all" ? filtros.categoria : undefined,
+      precoMin: filtros.precoMinimo,
+      precoMax: filtros.precoMaximo,
+    });
+  };
 
-      return matchesBrand && matchesType
-    })
-  }, [produtos, searchParams])
-
-  const listaProdutos = filteredProdutos.map((produto) => <CardPerfume key={produto.id} data={produto} />)
-
-  if (loading) {
-    return (
-      <div className="container py-8 px-6 md:py-10">
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Carregando produtos...</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  const handleLimparFiltros = () => {
+    setFiltros({
+      marca: "all",
+      categoria: "all",
+      precoMinimo: "",
+      precoMaximo: "",
+    });
+    carregarProdutos();
+  };
 
   return (
-    <>
-      <div>
-        <Hero />
-      </div>
+    <SidebarProvider>
+      <div className="flex flex-col min-h-full">
 
-      <div className="container py-8 px-6 md:py-10">
-        <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-6">
-          {/* Desktop Sidebar */}
-          <div className="hidden md:block">
-            <FiltersSidebar produtos={produtos} />
-          </div>
+        {/* Conteúdo com Sidebar à esquerda e produtos à direita */}
+        <div className="flex flex-1">
+          <ProdutoSidebar
+            filtros={filtros}
+            onFiltroChange={handleFiltroChange}
+            onAplicarFiltros={handleAplicarFiltros}
+            onLimparFiltros={handleLimparFiltros}
+            marcas={marcas}
+            categorias={categorias}
+          />
 
-          <div className="space-y-4">
-            {/* Mobile Filter Button */}
-            <div className="md:hidden">
-              <FiltersSidebar produtos={produtos} isMobile={true} />
+          <main className="flex-1 p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {loading ? (
+                <p>Carregando produtos...</p>
+              ) : produtos.length === 0 ? (
+                <p>Nenhum produto encontrado.</p>
+              ) : (
+                produtos.map((produto) => (
+                  <CardPerfume key={produto.id} data={produto} />
+                ))
+              )}
             </div>
-
-            {/* Results Summary */}
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">
-                {filteredProdutos.length === produtos.length
-                  ? `${produtos.length} produtos encontrados`
-                  : `${filteredProdutos.length} de ${produtos.length} produtos`}
-              </p>
-            </div>
-
-            {/* Products Grid */}
-            {filteredProdutos.length > 0 ? (
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
-                {listaProdutos}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <p className="text-lg font-medium text-muted-foreground mb-2">Nenhum produto encontrado</p>
-                <p className="text-sm text-muted-foreground">Tente ajustar os filtros para ver mais resultados</p>
-              </div>
-            )}
-          </div>
+          </main>
         </div>
       </div>
-    </>
-  )
+    </SidebarProvider>
+  );
 }

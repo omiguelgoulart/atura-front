@@ -1,14 +1,15 @@
 import Link from "next/link"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { ProdutoItf } from "../utils/types/ProdutoItf"
+import Produto from "../utils/types/ProdutoItf"
 
 
 
-export function CardPerfume({ data }: { data: ProdutoItf }) {
+
+export function CardPerfume({ data }: { data: Produto }) {
   return (
     <Link key={data.id} href={`/perfume/${data.id}`}>
-      <Card className="overflow-hidden transition-all hover:shadow-lg rounded-xl">
-        <div className="relative aspect-square">
+      <Card className="h-full flex flex-col justify-between overflow-hidden rounded-xl border transition-all hover:shadow-md hover:-translate-y-1">
+        <div className="relative aspect-square bg-zinc-100">
           <img
             src={data.foto || "/placeholder.svg"}
             alt={data.nome}

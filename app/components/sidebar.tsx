@@ -1,170 +1,176 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import { useForm, Controller } from "react-hook-form"
-import { useRouter, useSearchParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
-import { FilterIcon } from "lucide-react"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import type { ProdutoItf } from "../utils/types/ProdutoItf"
+import { useMemo } from "react";
+import { Filter, X } from "lucide-react";
 
-interface FiltersSidebarProps {
-  produtos: ProdutoItf[]
-  isMobile?: boolean
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+} from "@/components/ui/sidebar";
+
+import { useProdutos } from "@/app/stores/useProduto"; // ajuste o path se necessário
+
+export interface Filtros {
+  marca: string;
+  categoria: string;
+  precoMinimo: string;
+  precoMaximo: string;
 }
 
-interface FormValues {
-  brandIds: number[]
-  types: string[]
+interface ProdutoFilterSidebarProps {
+  filtros: Filtros;
+  onFiltroChange: (campo: keyof Filtros, valor: string) => void;
+  onAplicarFiltros: () => void;
+  onLimparFiltros: () => void;
+  marcas: { id: string; nome: string }[];
+  categorias: string[];
 }
 
-export default function Sidebar({ produtos, isMobile = false }: FiltersSidebarProps) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+export function ProdutoSidebar({
+  filtros,
+  onFiltroChange,
+  onAplicarFiltros,
+  onLimparFiltros,
+}: ProdutoFilterSidebarProps) {
+  const { produtos } = useProdutos();
 
-  const { control, handleSubmit, reset } = useForm<FormValues>({
-    defaultValues: { brandIds: [], types: [] },
-  })
+  // Extrair marcas únicas dos produtos
+  const marcas = useMemo(() => {
+    const mapa = new Map();
+    produtos.forEach((p) => {
+      if (p.marca) mapa.set(p.marca.id, p.marca.nome);
+    });
+    return Array.from(mapa.entries()).map(([id, nome]) => ({ id: String(id), nome }));
+  }, [produtos]);
 
-  // Initialize form with URL params only once
-  useEffect(() => {
-    const marcaParam = searchParams.get("marca")
-    const tipoParam = searchParams.get("tipo")
+// Extrair categorias únicas
+const categorias = useMemo(() => {
+  const CATEGORIAS_FIXAS = ["Masculino", "Feminino", "Infantil", "Unissex"];
+  const categoriasDosProdutos = produtos.map((p) => p.categoria).filter(Boolean);
+  const todasCategorias = new Set([...CATEGORIAS_FIXAS, ...categoriasDosProdutos]);
+  return Array.from(todasCategorias);
+}, [produtos]);
 
-    const initialValues: FormValues = {
-      brandIds: marcaParam ? marcaParam.split(",").map(Number) : [],
-      types: tipoParam ? tipoParam.split(",") : [],
-    }
-
-    reset(initialValues)
-  }, [searchParams, reset])
-
-  const marcasUnicas = Array.from(new Map(produtos.map((p) => [p.marca.id, p.marca])).values())
-  const categoriasUnicas = Array.from(new Set(produtos.map((p) => p.categoria)))
-
-  const onSubmit = (data: FormValues) => {
-    const params = new URLSearchParams()
-
-    if (data.brandIds.length > 0) {
-      params.set("marca", data.brandIds.join(","))
-    }
-    if (data.types.length > 0) {
-      params.set("tipo", data.types.join(","))
-    }
-
-    const newUrl = params.toString() ? `/?${params.toString()}` : "/"
-    router.push(newUrl)
-  }
-
-  const handleReset = () => {
-    reset({ brandIds: [], types: [] })
-    router.push("/")
-  }
-
-  const FiltersContent = () => (
-    <div className="space-y-6">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Marcas Filter */}
-        <div>
-          <h3 className="text-lg font-medium mb-3">Marcas</h3>
-          <div className="space-y-2 max-h-48 overflow-y-auto">
-            {marcasUnicas.map((marca) => (
-              <Controller
-                key={marca.id}
-                name="brandIds"
-                control={control}
-                render={({ field }) => {
-                  const value: number[] = field.value || []
-                  return (
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`brand-${marca.id}`}
-                        checked={value.includes(marca.id)}
-                        onCheckedChange={(checked) => {
-                          const newValue = checked ? [...value, marca.id] : value.filter((id) => id !== marca.id)
-                          field.onChange(newValue)
-                        }}
-                      />
-                      <Label htmlFor={`brand-${marca.id}`} className="text-sm font-normal cursor-pointer flex-1">
-                        {marca.nome}
-                      </Label>
-                    </div>
-                  )
-                }}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Categorias Filter */}
-        <div>
-          <h3 className="text-lg font-medium mb-3">Categoria</h3>
-          <div className="space-y-2">
-            {categoriasUnicas.map((categoria) => (
-              <Controller
-                key={categoria}
-                name="types"
-                control={control}
-                render={({ field }) => {
-                  const value: string[] = field.value || []
-                  return (
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`type-${categoria}`}
-                        checked={value.includes(categoria)}
-                        onCheckedChange={(checked) => {
-                          const newValue = checked ? [...value, categoria] : value.filter((t) => t !== categoria)
-                          field.onChange(newValue)
-                        }}
-                      />
-                      <Label htmlFor={`type-${categoria}`} className="text-sm font-normal cursor-pointer flex-1">
-                        {categoria}
-                      </Label>
-                    </div>
-                  )
-                }}
-              />
-            ))}
-          </div>
-        </div>
-
-        <div className="flex gap-2">
-          <Button variant="outline" type="button" onClick={handleReset} className="flex-1">
-            Limpar
-          </Button>
-          <Button type="submit" className="flex-1">
-            Aplicar
-          </Button>
-        </div>
-      </form>
-    </div>
-  )
-
-  if (isMobile) {
-    return (
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button variant="outline" size="sm" className="mb-4 w-full">
-            <FilterIcon className="h-4 w-4 mr-2" />
-            Filtros
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="left" className="w-[300px] sm:w-[350px]">
-          <SheetHeader className="mb-5">
-            <SheetTitle>Filtros</SheetTitle>
-          </SheetHeader>
-          <FiltersContent />
-        </SheetContent>
-      </Sheet>
-    )
-  }
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Filtros</h2>
-      <FiltersContent />
-    </div>
-  )
+    <Sidebar className="h-[calc(100vh-64px)] mt-16">
+      <SidebarHeader className="border-b">
+        <div className="flex items-center gap-2 px-4 py-2">
+          <Filter className="h-5 w-5" />
+          <h2 className="text-lg font-semibold">Filtros de Produtos</h2>
+        </div>
+      </SidebarHeader>
+
+      <SidebarContent>
+        <div className="p-4 space-y-6">
+          {/* Filtro por Marca */}
+          <SidebarGroup>
+            <SidebarGroupLabel>Marca</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <Select
+                value={filtros.marca}
+                onValueChange={(value) => onFiltroChange("marca", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Todas as marcas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas</SelectItem>
+                  {marcas.map((marca) => (
+                    <SelectItem key={marca.id} value={marca.id}>
+                      {marca.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </SidebarGroupContent>
+          </SidebarGroup>
+
+          {/* Filtro por Categoria */}
+          <SidebarGroup>
+            <SidebarGroupLabel>Categoria</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <Select
+                value={filtros.categoria}
+                onValueChange={(value) => onFiltroChange("categoria", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Todas as categorias" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas</SelectItem>
+                  {categorias.map((categoria) => (
+                    <SelectItem key={categoria} value={categoria}>
+                      {categoria}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </SidebarGroupContent>
+          </SidebarGroup>
+
+          {/* Filtros de Preço */}
+          <SidebarGroup>
+            <SidebarGroupLabel>Faixa de Preço</SidebarGroupLabel>
+            <SidebarGroupContent className="space-y-3">
+              <div>
+                <Label htmlFor="preco-minimo">Preço Mínimo (R$)</Label>
+                <Input
+                  id="preco-minimo"
+                  type="number"
+                  placeholder="0,00"
+                  value={filtros.precoMinimo}
+                  onChange={(e) => onFiltroChange("precoMinimo", e.target.value)}
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+              <div>
+                <Label htmlFor="preco-maximo">Preço Máximo (R$)</Label>
+                <Input
+                  id="preco-maximo"
+                  type="number"
+                  placeholder="999,99"
+                  value={filtros.precoMaximo}
+                  onChange={(e) => onFiltroChange("precoMaximo", e.target.value)}
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+            </SidebarGroupContent>
+          </SidebarGroup>
+
+          {/* Botões de Ação */}
+          <div className="space-y-2 pt-4">
+            <Button onClick={onAplicarFiltros} className="w-full">
+              <Filter className="mr-2 h-4 w-4" />
+              Aplicar Filtros
+            </Button>
+            <Button
+              onClick={onLimparFiltros}
+              variant="outline"
+              className="w-full bg-transparent"
+            >
+              <X className="mr-2 h-4 w-4" />
+              Limpar Filtros
+            </Button>
+          </div>
+        </div>
+      </SidebarContent>
+    </Sidebar>
+  );
 }

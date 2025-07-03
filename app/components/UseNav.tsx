@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { LogIn, LogOut, UserCircle } from "lucide-react"
-import { useClienteStore } from "../context/ClienteContext"
+import { useAuthStore } from "@/app/login/stores/authStore" // ✅ Caminho correto
 
 interface UserNavProps {
   isLoggedIn: boolean;
@@ -20,8 +20,8 @@ interface UserNavProps {
 }
 
 export function UserNav({}: UserNavProps) {
-  const { cliente, deslogaCliente } = useClienteStore()
-  const isLoggedIn = !!cliente?.id
+  const { user: cliente, deslogaCliente } = useAuthStore(); // ✅ Nome ajustado para manter compatibilidade
+  const isLoggedIn = !!cliente?.id;
 
   if (!isLoggedIn) {
     return (
@@ -31,16 +31,15 @@ export function UserNav({}: UserNavProps) {
           Login
         </Link>
       </Button>
-    )
+    );
   }
 
- 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
           <Avatar className="h-10 w-10">
-            <AvatarImage src="/default-avatar.png" alt={`Avatar de ${cliente.nome}`}/>
+            <AvatarImage src="/default-avatar.png" alt={`Avatar de ${cliente.nome}`} />
             <AvatarFallback>
               {cliente.nome?.slice(0, 2).toUpperCase() || "?"}
             </AvatarFallback>
@@ -70,5 +69,5 @@ export function UserNav({}: UserNavProps) {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }
