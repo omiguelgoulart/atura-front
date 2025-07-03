@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useProdutos } from "./stores/useProduto";
 import { CardPerfume } from "./components/CardPerfume";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { ProdutoSidebar } from "./components/Sidebar";
+import  ProdutoSidebar  from "./components/ProdutoSidebar";
 
 export default function PerfumePage() {
   const { produtos, carregarProdutos, filtrarProdutos, loading } = useProdutos();

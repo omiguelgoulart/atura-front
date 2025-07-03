@@ -40,7 +40,7 @@ interface ProdutoFilterSidebarProps {
   categorias: string[];
 }
 
-export function ProdutoSidebar({
+export default function ProdutoSidebar({
   filtros,
   onFiltroChange,
   onAplicarFiltros,
