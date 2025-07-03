@@ -44,8 +44,6 @@ export const useProdutos = create<ProdutoStore>((set, get) => ({
         produtos: data,
         todosProdutos: data,
       });
-
-      toast.success("Produtos carregados com sucesso");
     } catch (error) {
       console.error("Erro ao carregar produtos:", error);
       set({ erro: "Erro ao carregar produtos" });

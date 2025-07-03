@@ -63,10 +63,33 @@ export function TabsAvaliacao({ reviews }: TabsReviewProps) {
                     })}
                   </span>
                 </div>
+
                 {review.comentario && (
                   <p className="text-gray-300 mt-2 whitespace-pre-wrap">
                     {review.comentario}
                   </p>
+                )}
+
+                {/* ✅ Resposta da avaliação */}
+                {Array.isArray(review.respostas) && review.respostas.length > 0 && (
+                  <div className=" pl-4 border-l-2 border-gray-700">
+                    <p className="text-sm text-gray-400">Resposta da equipe:</p>
+                    {review.respostas.map((resposta, idx) => (
+                      <div key={idx} className="mb-2">
+                        <p className="text-blue mt-1 whitespace-pre-wrap">
+                          {resposta.mensagem}
+                        </p>
+                        {resposta.admin?.nome && (
+                          <p className="text-xs text-white mt-1">
+                            — {resposta.admin.nome}
+                            {resposta.respondidoEm && (
+                              <> em {new Date(resposta.respondidoEm).toLocaleDateString("pt-BR")}</>
+                            )}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             ))
